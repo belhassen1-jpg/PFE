@@ -1,6 +1,7 @@
 package com.example.pidev.Entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -24,7 +25,6 @@ public class Partenaire implements Serializable {
 
     // Relation inverse pour accéder aux conventions liées
     @OneToMany(mappedBy = "partenaire")
-    @JsonBackReference
     private Set<Convention> conventions;
     @OneToMany(mappedBy = "partenaire")
     private Set<Evenement> evenements;

@@ -32,7 +32,7 @@ public class JobApplication implements Serializable {
     private StatutDemande status;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_offer_id")
-    @JsonBackReference
+    //@JsonBackReference
     private JobOffer jobOffer;
 
     @ManyToOne(fetch = FetchType.LAZY)

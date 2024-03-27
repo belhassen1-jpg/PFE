@@ -36,8 +36,4 @@ public class Rapport implements Serializable {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dernier_bulletin_paie_id")
     private BulletinPaie dernierBulletinPaie;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "derniere_declaration_fiscale_id")
-    private DeclarationFiscale derniereDeclarationFiscale;
 }

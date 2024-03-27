@@ -25,10 +25,7 @@ public class Planning implements Serializable {
 
     @Temporal(TemporalType.DATE)
     private Date dateFinValidite;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference // pour empêcher la sérialisation de l'employé dans le planning
-    private Employe employe;
+
     @OneToMany(mappedBy = "planning", fetch = FetchType.LAZY)
-    @JsonManagedReference // pour sérialiser normalement les feuilles de temps dans le planning
     private List<FeuilleTemps> feuillesDeTemps;
 }

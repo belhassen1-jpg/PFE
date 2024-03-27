@@ -31,11 +31,11 @@ public class FeuilleTemps implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employe_id", nullable = false)
-    @JsonBackReference
+    //@JsonBackReference
     private Employe employe;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planning_id", nullable = false)
-    @JsonBackReference
+    //@JsonBackReference
     private Planning planning;
 }

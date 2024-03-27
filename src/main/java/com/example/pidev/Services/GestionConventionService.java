@@ -48,23 +48,12 @@ public class GestionConventionService {
     public DemandeParticipationConvention validerDemandeParticipation(Long demandeId) {
         DemandeParticipationConvention demande = demandeRepository.findById(demandeId).orElseThrow(() -> new EntityNotFoundException("Demande non trouvée"));
         demande.setEstValidee(true);
-        // Récupérer l'événement et l'employé à partir de la demande
-        Convention convention = demande.getConvention();
-        Employe employe = demande.getEmploye();
-
-        // Ajouter l'employé à la liste des participants de l'événement
-        Set<Employe> participants = convention.getParticipants();
-        participants.add(employe);
-        convention.setParticipants(participants);
-
-        // Sauvegarder les modifications
-        conventionRepository.save(convention);
         return demandeRepository.save(demande);
     }
 
 
     public List<Convention> trouverConventionsEtParticipants() {
-        return conventionRepository.findAllWithParticipants();
+        return conventionRepository.findAll();
     }
 
 
@@ -76,18 +65,28 @@ public class GestionConventionService {
         return demandeRepository.findByConventionIdAndEstValidee(conventionId, true);
     }
     public void retirerEmployeDesConventions(Long empId) {
-        List<Convention> conventions = conventionRepository.findByParticipantsId(empId);
-        for (Convention convention : conventions) {
-            convention.getParticipants().removeIf(participant -> participant.getEmpId().equals(empId));
-            conventionRepository.save(convention);
+        // Rechercher toutes les demandes de participation de l'employé à des conventions
+        List<DemandeParticipationConvention> demandes = demandeRepository.findByEmployeId(empId);
+
+        // Parcourir chaque demande et la supprimer
+        for (DemandeParticipationConvention demande : demandes) {
+            demandeRepository.delete(demande);
         }
     }
 
-    public void retirerEmployeDeLEvenement(Long empId, Long conventionId) {
-        Convention convention = conventionRepository.findById(conventionId)
-                .orElseThrow(() -> new EntityNotFoundException("convention non trouvé"));
-        convention.getParticipants().removeIf(participant -> participant.getEmpId().equals(empId));
-        conventionRepository.save(convention);
+    public void retirerEmployeDeLConvention(Long empId, Long conventionId) {
+        // Recherche de toutes les demandes de l'employé pour cette convention spécifique
+        List<DemandeParticipationConvention> demandes = demandeRepository.findByEmployeIdAndConventionId(empId, conventionId);
+
+        // Pour chaque demande trouvée, mettre à jour le statut ou supprimer la demande
+        for (DemandeParticipationConvention demande : demandes) {
+            // Si vous souhaitez simplement invalider la demande
+            demande.setEstValidee(false);
+            // Ou si vous souhaitez supprimer la demande
+            // demandeParticipationRepository.delete(demande);
+        }
+        // Sauvegardez les modifications des demandes
+        demandeRepository.saveAll(demandes);
     }
 
 }

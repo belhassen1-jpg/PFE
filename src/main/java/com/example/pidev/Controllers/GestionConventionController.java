@@ -77,7 +77,7 @@ public class GestionConventionController {
 
     @DeleteMapping("/evenement/{conventionId}/employee/{empId}")
     public ResponseEntity<?> retirerEmployeDeLConvention(@PathVariable Long conventionId, @PathVariable Long empId) {
-        service.retirerEmployeDeLEvenement(empId, conventionId);
+        service.retirerEmployeDeLConvention(empId, conventionId);
         return ResponseEntity.ok().build();
     }
 

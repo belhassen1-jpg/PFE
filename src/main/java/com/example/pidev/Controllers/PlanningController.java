@@ -24,19 +24,16 @@ public class PlanningController {
     @Autowired
     private FeuilleTempsRepository feuilleTempsRepository;
 
-    @PostMapping("/employe/{employeId}")
-    public ResponseEntity<Planning> creerPlanningPourEmploye(
-            @PathVariable Long employeId,
-            @RequestBody Planning planning) {
-
-        Planning createdPlanning = planningService.creerPlanningPourEmploye(employeId, planning);
+    @PostMapping("/employe")
+    public ResponseEntity<Planning> creerPlanning(@RequestBody Planning planning) {
+        Planning createdPlanning = planningService.creerPlanning(planning);
         return new ResponseEntity<>(createdPlanning, HttpStatus.CREATED);
     }
 
-    @PostMapping("/{planningId}/employe/{employeId}")
+    @PostMapping("/feuilleTemps/employe/{employeId}/planning/{planningId}")
     public ResponseEntity<FeuilleTemps> creerEtAssocierFeuilleTemps(
-            @PathVariable Long planningId,
             @PathVariable Long employeId,
+            @PathVariable Long planningId,
             @RequestBody FeuilleTemps feuilleTemps) {
 
         FeuilleTemps createdFeuilleTemps = planningService.creerEtAssocierFeuilleTemps(employeId, planningId, feuilleTemps);

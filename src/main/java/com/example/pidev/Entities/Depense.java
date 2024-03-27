@@ -27,6 +27,5 @@ public class Depense implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "employe_id")
-    @JsonBackReference
     private Employe employe;
 }

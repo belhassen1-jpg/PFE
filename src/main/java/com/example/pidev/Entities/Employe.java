@@ -51,17 +51,15 @@ public class Employe implements Serializable {
     private Departement departement;
 
     @OneToMany(mappedBy = "employe")
-    @JsonManagedReference
     private Set<Paie> Paiess;
 
     @OneToMany(mappedBy = "employe", fetch = FetchType.LAZY)
-    @JsonManagedReference // pour sérialiser normalement les feuilles de temps dans l'employé
     private List<FeuilleTemps> feuillesDeTemps;
 
 
     @ManyToMany(mappedBy = "participants")
-    @JsonBackReference
     private Set<SessionFormation> sessionsFormation;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "iduser")
     @JsonIgnore
@@ -74,34 +72,21 @@ public class Employe implements Serializable {
     private Set<DemandeConge> demandesConge;
 
     @OneToMany(mappedBy = "employe")
-    private List<EvaluationPerformance> evaluationsPerformance;
-
-    @ManyToMany(mappedBy = "participants")
-    @JsonBackReference
-    private Set<Convention> conventionsParticipated;
-    @ManyToMany(mappedBy = "participants")
-    @JsonBackReference
-    private Set<Evenement> evenementsParticipated;
-
-    @OneToOne(mappedBy = "employe", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
-    private Rapport rapport;
+    private Set<DemandeParticipationConvention>demandeParticipationConventions ;
 
     @OneToMany(mappedBy = "employe")
-    @JsonManagedReference
-    private List<DeclarationFiscale> declarationsFiscales;
+    private Set<DemandeParticipationEvenement> demandeParticipationEvenements;
 
-    // Relation avec les dépenses
+    @OneToMany(mappedBy = "employe")
+    private Set<Paie> paies;
+
+
     @OneToMany(mappedBy = "employe", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
     private Set<Depense> depenses = new HashSet<>();
 
-    // Relation avec les objectifs d'épargne
     @OneToMany(mappedBy = "employe", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
     private Set<ObjectifEpargne> objectifsEpargne = new HashSet<>();
 
-    // Relation avec les analyses financières
     @OneToMany(mappedBy = "employe", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
     private Set<AnalyseFinanciere> analysesFinancieres = new HashSet<>();
 }

@@ -28,16 +28,9 @@ public class DeclarationFiscale implements Serializable {
     private String referenceDeclaration; // Une référence unique pour la déclaration
     private String autoriteFiscale; // L'autorité fiscale responsable
 
-    // Relation avec l'employé
-    @ManyToOne
-    @JoinColumn(name = "employe_id", referencedColumnName = "emp_id")
-    @JsonBackReference
-    private Employe employe;
 
-    // Relation avec l'entité Paie pour référencer la paie spécifique à cette déclaration
     @OneToOne
-    @JoinColumn(name = "paie_id", referencedColumnName = "id")
-    @JsonBackReference
-    private Paie paie;
+    @JoinColumn(name = "bulletinPaie_id", referencedColumnName = "id")
+    private BulletinPaie bulletinPaie;
 
 }

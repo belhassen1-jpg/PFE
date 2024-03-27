@@ -26,10 +26,8 @@ public class AnalyseFinanciere implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "employe_id")
-    @JsonBackReference
     private Employe employe;
 
-    // Ajoutez des champs calculés ou des métriques spécifiques à l'analyse
     private BigDecimal tauxEpargneMensuel; // Calculé comme une portion du revenu
     private BigDecimal depenseMoyenneMensuelle;
     private BigDecimal epargneMoyenneMensuelle;

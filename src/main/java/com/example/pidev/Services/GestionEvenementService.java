@@ -17,6 +17,7 @@ import javax.persistence.EntityNotFoundException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -37,7 +38,6 @@ public class GestionEvenementService {
                 .orElseThrow(() -> new EntityNotFoundException("Partenaire non trouvé"));
 
         evenement.setPartenaire(partenaire); // Associe le partenaire à l'événement
-        // La logique pour vérifier si c'est une mise à jour ou une création d'un nouvel événement
         return evenementRepository.save(evenement);
     }
 
@@ -60,18 +60,6 @@ public class GestionEvenementService {
         DemandeParticipationEvenement demande = demandeParticipationEvenementRepository.findById(demandeId)
                 .orElseThrow(() -> new EntityNotFoundException("Demande non trouvée"));
         demande.setEstValidee(true);
-
-        // Récupérer l'événement et l'employé à partir de la demande
-        Evenement evenement = demande.getEvenement();
-        Employe employe = demande.getEmploye();
-
-        // Ajouter l'employé à la liste des participants de l'événement
-        Set<Employe> participants = evenement.getParticipants();
-        participants.add(employe);
-        evenement.setParticipants(participants);
-
-        // Sauvegarder les modifications
-        evenementRepository.save(evenement);
         return demandeParticipationEvenementRepository.save(demande);
     }
 
@@ -82,38 +70,37 @@ public class GestionEvenementService {
 
     // Trouver les participants d'un événement
     public Set<Employe> trouverParticipantsParEvenement(Long evenementId) {
-        Evenement evenement = evenementRepository.findById(evenementId)
-                .orElseThrow(() -> new EntityNotFoundException("Événement non trouvé"));
-        return evenement.getParticipants();
+        List<DemandeParticipationEvenement> demandes = demandeParticipationEvenementRepository.findByEvenementIdAndEstValidee(evenementId, true);
+        return demandes.stream().map(DemandeParticipationEvenement::getEmploye).collect(Collectors.toSet());
     }
 
     // Méthode pour récupérer la liste des événements et leurs participants
     public List<Evenement> trouverEvenementsEtParticipants() {
-        return evenementRepository.findAllWithParticipants();
+        return evenementRepository.findAll();
     }
 
     public void retirerEmployeDesEvenements(Long empId) {
-        List<Evenement> evenements = evenementRepository.findByParticipantsId(empId);
-        for (Evenement evenement : evenements) {
-            evenement.getParticipants().removeIf(participant -> participant.getEmpId().equals(empId));
-            evenementRepository.save(evenement);
+        List<DemandeParticipationEvenement> demandes = demandeParticipationEvenementRepository.findByEmployeIdAndEstValidee(empId, true);
+        for (DemandeParticipationEvenement demande : demandes) {
+            demande.setEstValidee(false);
         }
+        demandeParticipationEvenementRepository.saveAll(demandes);
     }
 
     public void retirerEmployeDeLEvenement(Long empId, Long evenementId) {
-        Evenement evenement = evenementRepository.findById(evenementId)
-                .orElseThrow(() -> new EntityNotFoundException("Événement non trouvé"));
-        evenement.getParticipants().removeIf(participant -> participant.getEmpId().equals(empId));
-        evenementRepository.save(evenement);
+        List<DemandeParticipationEvenement> demandes = demandeParticipationEvenementRepository.findByEmployeIdAndEvenementIdAndEstValidee(empId, evenementId, true);
+
+        for (DemandeParticipationEvenement demande : demandes) {
+            demande.setEstValidee(false);
+        }
+        demandeParticipationEvenementRepository.saveAll(demandes);
     }
 
 
     public int compterEvenementsParticipesParEmploye(Long employeId) {
-        Employe employe = employeRepository.findById(employeId)
-                .orElseThrow(() -> new EntityNotFoundException("Employé non trouvé avec l'id : " + employeId));
+        // Utilisation directe des demandes de participation pour compter les événements auxquels un employé a participé
+        List<DemandeParticipationEvenement> demandesValidees = demandeParticipationEvenementRepository.findByEmployeIdAndEstValidee(employeId, true);
 
-        return (int) evenementRepository.findAll().stream()
-                .filter(evenement -> evenement.getParticipants().contains(employe))
-                .count();
+        return demandesValidees.size();
     }
 }

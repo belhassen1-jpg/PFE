@@ -29,7 +29,7 @@ public class ObjectifEpargne implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "employe_id")
-    @JsonBackReference
+    //@JsonBackReference
 
     private Employe employe;
 

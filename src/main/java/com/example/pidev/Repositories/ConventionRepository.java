@@ -12,8 +12,4 @@ import java.util.List;
 public interface ConventionRepository extends JpaRepository<Convention, Long> {
     List<Convention> findByPartenaireId(Long partenaireId);
 
-    @Query("SELECT c FROM Convention c JOIN FETCH c.participants")
-    List<Convention> findAllWithParticipants();
-    @Query("SELECT c FROM Convention c JOIN c.participants p WHERE p.empId = :empId")
-    List<Convention> findByParticipantsId(@Param("empId") Long empId);
 }

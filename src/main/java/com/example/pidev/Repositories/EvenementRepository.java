@@ -11,9 +11,4 @@ import java.util.List;
 public interface EvenementRepository extends JpaRepository<Evenement, Long> {
     List<Evenement> findByPartenaireId(Long partenaireId);
 
-
-    @Query("SELECT e FROM Evenement e JOIN FETCH e.participants")
-    List<Evenement> findAllWithParticipants();
-    @Query("SELECT e FROM Evenement e JOIN e.participants p WHERE p.empId = :empId")
-    List<Evenement> findByParticipantsId(@Param("empId") Long empId);
 }

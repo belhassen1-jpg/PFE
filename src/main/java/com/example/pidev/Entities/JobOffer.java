@@ -37,7 +37,7 @@ public class JobOffer implements Serializable {
 
 
     @OneToMany(mappedBy = "jobOffer", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+   // @JsonManagedReference
     private List<JobApplication> applications = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.LAZY)

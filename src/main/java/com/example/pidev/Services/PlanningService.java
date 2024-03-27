@@ -28,11 +28,8 @@ public class PlanningService {
 
 
 
-    public Planning creerPlanningPourEmploye(Long employeId, Planning planning) {
-        Employe employe = employeRepository.findById(employeId)
-                .orElseThrow(() -> new EntityNotFoundException("Employé not found with id: " + employeId));
-
-        planning.setEmploye(employe);
+    public Planning creerPlanning(Planning planning) {
+        // Création et sauvegarde du planning sans référence directe à un employé
         return planningRepository.save(planning);
     }
 
@@ -42,9 +39,11 @@ public class PlanningService {
         Planning planning = planningRepository.findById(planningId)
                 .orElseThrow(() -> new EntityNotFoundException("Planning not found with id: " + planningId));
 
+        // Associer la feuille de temps à l'employé et au planning
         feuilleTemps.setEmploye(employe);
         feuilleTemps.setPlanning(planning);
 
+        // Sauvegarder la feuille de temps avec ses associations
         return feuilleTempsRepository.save(feuilleTemps);
     }
 

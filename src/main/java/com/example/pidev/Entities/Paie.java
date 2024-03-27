@@ -14,6 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Paie implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +38,5 @@ public class Paie implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "employe_id")
-    @JsonBackReference
     private Employe employe;
 }

@@ -32,15 +32,8 @@ public class Convention implements Serializable {
     // Relation avec Partenaire
     @ManyToOne
     @JoinColumn(name = "partenaire_id")
-    @JsonIgnore
     private Partenaire partenaire;
 
-    @ManyToMany
-    @JoinTable(
-            name = "convention_participants",
-            joinColumns = @JoinColumn(name = "convention_id"),
-            inverseJoinColumns = @JoinColumn(name = "employe_id")
-    )
-    @JsonIgnoreProperties("evenementsParticipated")
-    private Set<Employe> participants;
+    @OneToMany(mappedBy = "convention")
+    private Set<DemandeParticipationConvention> demandeParticipationConventions;
 }

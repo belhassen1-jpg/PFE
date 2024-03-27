@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BulletinPaieRepository extends JpaRepository<BulletinPaie,Long> {
-    @Query("SELECT bp FROM BulletinPaie bp WHERE bp.detailsPaie.employe.empId = :employeId ORDER BY bp.dateEmission DESC")
+    @Query("SELECT bp FROM BulletinPaie bp WHERE bp.employe.empId = :employeId ORDER BY bp.dateEmission DESC")
     Optional<BulletinPaie> findTopByEmployeIdOrderByDateEmissionDesc(@Param("employeId") Long empId);
-
     List<BulletinPaie> findByEmployeEmpId(Long empId);
 }

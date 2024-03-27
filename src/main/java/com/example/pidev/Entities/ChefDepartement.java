@@ -16,6 +16,7 @@ import javax.persistence.PrimaryKeyJoinColumn;
 @PrimaryKeyJoinColumn(name = "emp_id")
 public class ChefDepartement extends Employe {
     private String specialisation;
+
     @OneToOne(mappedBy = "chefDepartement")
     @JsonIgnore
     private Departement departementDirige;

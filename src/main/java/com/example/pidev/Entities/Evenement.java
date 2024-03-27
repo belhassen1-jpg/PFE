@@ -1,7 +1,9 @@
 package com.example.pidev.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -28,17 +30,10 @@ public class Evenement implements Serializable {
 
     private String lieu;
 
-    @ManyToMany
-    @JoinTable(
-            name = "evenement_participants",
-            joinColumns = @JoinColumn(name = "evenement_id"),
-            inverseJoinColumns = @JoinColumn(name = "employe_id")
-    )
-    @JsonIgnoreProperties("evenementsParticipated")
-    private Set<Employe> participants;
+    @OneToMany(mappedBy = "evenement")
+    private Set<DemandeParticipationEvenement> demandeParticipationevenments;
 
     @ManyToOne
     @JoinColumn(name = "partenaire_id")
-    @JsonIgnore
     private Partenaire partenaire;
 }

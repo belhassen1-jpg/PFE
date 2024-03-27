@@ -34,8 +34,6 @@ public class ServicePaie {
 
 
 
-    // Méthodes pour interagir avec l'entité Paie
-
     @Transactional
     public Paie calculerPaie(Long employeId) {
 
@@ -121,69 +119,74 @@ public class ServicePaie {
 
     @Transactional
     public BulletinPaie genererBulletinPaie(Long employeId) {
-        Paie paie = paieRepository.findTopByEmployeEmpIdOrderByDatePaieDesc(employeId)
+        // Trouver la dernière paie pour l'employé spécifié
+        Paie dernierePaie = paieRepository.findTopByEmployeEmpIdOrderByDatePaieDesc(employeId)
                 .orElseThrow(() -> new RuntimeException("Dernière paie non trouvée pour l'employé avec l'id : " + employeId));
 
-            BulletinPaie bulletin = new BulletinPaie();
-            // Affecter les valeurs de Paie à BulletinPaie
-             bulletin.setDetailsPaie(paie);
-             bulletin.setEmploye(paie.getEmploye());
-            bulletin.setSalaireBrut(paie.getSalaireBrut());
-            bulletin.setSalaireNet(paie.getSalaireNet());
+        // Créer un nouveau bulletin de paie en se basant sur la dernière paie
+        BulletinPaie bulletin = new BulletinPaie();
+        bulletin.setDatePaie(dernierePaie.getDatePaie());
+        bulletin.setEmploye(dernierePaie.getEmploye()); // Relier le bulletin à l'employé concerné
+        bulletin.setTauxHoraire(dernierePaie.getTauxHoraire());
+        bulletin.setHeuresTravaillees(dernierePaie.getHeuresTravaillees());
+        bulletin.setHeuresSupplementaires(dernierePaie.getHeuresSupplementaires());
+        bulletin.setTauxHeuresSupplementaires(dernierePaie.getTauxHeuresSupplementaires());
+        bulletin.setMontantPrimes(dernierePaie.getMontantPrimes());
+        bulletin.setMontantDeductions(dernierePaie.getMontantDeductions());
+        bulletin.setCotisationsSociales(dernierePaie.getCotisationsSociales());
+        bulletin.setImpotSurRevenu(dernierePaie.getImpotSurRevenu());
+        bulletin.setSalaireNet(dernierePaie.getSalaireNet());
+        bulletin.setSalaireBrut(dernierePaie.getSalaireBrut());
 
-            // La date d'émission est aujourd'hui
-            bulletin.setDateEmission(new Date());
+        // Configurer les champs spécifiques au bulletin de paie
+        bulletin.setDateEmission(new Date()); // La date d'émission est aujourd'hui
+        // Supposer que la période de début et de fin soit basée sur le mois de la date de paie de l'objet Paie
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dernierePaie.getDatePaie());
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+        Date periodeDebut = cal.getTime();
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        Date periodeFin = cal.getTime();
+        bulletin.setPeriodeDebut(periodeDebut);
+        bulletin.setPeriodeFin(periodeFin);
+        bulletin.setCommentaire("Bulletin généré automatiquement pour la période indiquée.");
+        bulletin.setNomEntreprise("Nom de l'Entreprise");
+        bulletin.setAdresseEntreprise("Adresse de l'Entreprise");
 
-            // Supposons que la période de début et de fin soit basée sur le mois de la datePaie de l'objet Paie
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(paie.getDatePaie());
-            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-            Date periodeDebut = cal.getTime();
-
-            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-            Date periodeFin = cal.getTime();
-
-            bulletin.setPeriodeDebut(periodeDebut);
-            bulletin.setPeriodeFin(periodeFin);
-
-            // Informations supplémentaires et commentaire
-            bulletin.setCommentaire("Bulletin généré automatiquement pour la période indiquée.");
-            // L'ajout des informations d'entreprise dépend de votre modèle de données
-            // Ici, elles sont ajoutées statiquement, mais elles pourraient être récupérées à partir de l'employé ou de la configuration de l'application
-            bulletin.setNomEntreprise("Nom de l'Entreprise");
-            bulletin.setAdresseEntreprise("Adresse de l'Entreprise");
+        // Enregistrer le bulletin de paie dans la base de données
         return bulletinPaieRepository.save(bulletin);
     }
 
 
 
 
-
+    @Transactional
     public DeclarationFiscale genererDeclarationFiscale(Employe employe) {
         if (employe == null) {
             throw new IllegalArgumentException("L'objet Employe ne peut pas être null.");
         }
 
-        // Récupérer la dernière paie pour cet employé
-        Paie dernierePaie = paieRepository.findTopByEmployeEmpIdOrderByDatePaieDesc(employe.getEmpId())
-                .orElseThrow(() -> new RuntimeException("Dernière paie non trouvée pour l'employé : " + employe.getEmpId()));
+        // Trouver le dernier bulletin de paie pour cet employé
+        BulletinPaie dernierBulletinPaie = bulletinPaieRepository.findTopByEmployeIdOrderByDateEmissionDesc(employe.getEmpId())
+                .orElseThrow(() -> new RuntimeException("Dernier bulletin de paie non trouvé pour l'employé : " + employe.getEmpId()));
 
         // Créer une nouvelle instance de DeclarationFiscale
         DeclarationFiscale declaration = new DeclarationFiscale();
-        declaration.setEmploye(employe);
-        declaration.setPaie(dernierePaie);
+        // Note: Assurez-vous que la méthode setBulletinPaie existe et est correcte
+        // selon votre conception de la base de données.
+        declaration.setBulletinPaie(dernierBulletinPaie);
         declaration.setDateDeclaration(new Date()); // Date actuelle pour la déclaration
 
-        // Utiliser les informations de la dernière paie pour définir les champs de la déclaration fiscale
-        declaration.setTotalRevenuImposable(dernierePaie.getSalaireBrut());
-        declaration.setMontantImpotDu(dernierePaie.getImpotSurRevenu());
-        declaration.setMontantCotisationsSocialesDu(dernierePaie.getCotisationsSociales());
+        // Utiliser les informations du dernier bulletin de paie pour définir les champs de la déclaration fiscale
+        declaration.setTotalRevenuImposable(dernierBulletinPaie.getSalaireBrut());
+        declaration.setMontantImpotDu(dernierBulletinPaie.getImpotSurRevenu());
+        declaration.setMontantCotisationsSocialesDu(dernierBulletinPaie.getCotisationsSociales());
 
         // Générer une référence unique pour la déclaration fiscale
-        String referenceDeclaration = "DF-" + employe.getEmpId()+ "-" + System.currentTimeMillis();
+        String referenceDeclaration = "DF-" + employe.getEmpId() + "-" + System.currentTimeMillis();
         declaration.setReferenceDeclaration(referenceDeclaration);
 
-        // Nom et adresse de l'autorité fiscale (doivent être fournis ou configurés ailleurs dans l'application)
+        // Nom et adresse de l'autorité fiscale
         declaration.setAutoriteFiscale("Direction Générale des Impôts de Tunisie");
 
         // Enregistrer la déclaration fiscale dans la base de données
